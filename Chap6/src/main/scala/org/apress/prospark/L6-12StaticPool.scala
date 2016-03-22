@@ -1,0 +1,84 @@
+package org.apress.prospark
+
+import java.nio.charset.StandardCharsets
+
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.apache.spark.streaming.Seconds
+import org.apache.spark.streaming.StreamingContext
+import org.eclipse.paho.client.mqttv3.MqttClient
+import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
+import org.json4s.DefaultFormats
+import org.json4s.JField
+import org.json4s.JsonAST.JObject
+import org.json4s.jvalue2extractable
+import org.json4s.jvalue2monadic
+import org.json4s.native.JsonMethods.parse
+import org.json4s.string2JsonInput
+
+object MqttSinkAppF {
+
+  def main(args: Array[String]) {
+    if (args.length != 4) {
+      System.err.println(
+        "Usage: MqttSinkApp <master> <appname> <outputBrokerUrl> <topic>" +
+          " In local mode, <master> should be 'local[n]' with n > 1")
+      System.exit(1)
+    }
+
+    val Seq(master, appName, outputBrokerUrl, topic) = args.toSeq
+
+    val conf = new SparkConf()
+      .setAppName(appName)
+      .setMaster(master)
+      .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
+
+    val batchInterval = 10
+
+    val ssc = new StreamingContext(conf, Seconds(batchInterval))
+
+    val mqttSink = ssc.sparkContext.broadcast(MqttSinkLazy(outputBrokerUrl))
+
+    HttpUtils.createStream(ssc, url = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%22IBM,GOOG,MSFT,AAPL,FB,ORCL,YHOO,TWTR,LNKD,INTC%22)%0A%09%09&format=json&diagnostics=true&env=http%3A%2F%2Fdatatables.org%2Falltables.env",
+      interval = batchInterval)
+      .flatMap(rec => {
+        val query = parse(rec) \ "query"
+        ((query \ "results" \ "quote").children).map(rec => JObject(JField("Timestamp", query \ "created")).merge(rec))
+      })
+      .map(rec => {
+        implicit val formats = DefaultFormats
+        rec.children.map(f => f.extract[String]) mkString ","
+      })
+      .foreachRDD { rdd =>
+        rdd.foreachPartition { par =>
+          par.foreach(message => mqttSink.value.client.publish(topic, new MqttMessage(message.getBytes(StandardCharsets.UTF_8))))
+        }
+      }
+
+    ssc.start()
+    ssc.awaitTermination()
+  }
+
+}
+
+class MqttSinkLazy(brokerUrl: String) extends Serializable {
+  lazy val client = {
+    val client = new MqttClient(brokerUrl, MqttClient.generateClientId(), new MemoryPersistence())
+    client.connect()
+    sys.addShutdownHook {
+      client.disconnect()
+      client.close()
+    }
+    client
+  }
+}
+
+object MqttSinkLazy {
+  val brokerUrl = "tcp://localhost:1883"
+  val client = new MqttSinkLazy(brokerUrl)
+
+  def apply(brokerUrl: String): MqttSinkLazy = {
+    client
+  }
+}
