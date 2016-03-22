@@ -1,0 +1,45 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "squareId",
+      "nullable": false,
+      "type": "integer"
+    },
+    {
+      "name": "timeInterval",
+      "nullable": false,
+      "type": "long"
+    },
+    {
+      "name": "countryCode",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "smsInActivity",
+      "nullable": true,
+      "type": "float"
+    },
+    {
+      "name": "smsOutActivity",
+      "nullable": true,
+      "type": "float"
+    },
+    {
+      "name": "callInActivity",
+      "nullable": true,
+      "type": "float"
+    },
+    {
+      "name": "callOutActivity",
+      "nullable": true,
+      "type": "float"
+    },
+    {
+      "name": "internetTrafficActivity",
+      "nullable": true,
+      "type": "float"
+    }
+  ]
+}
