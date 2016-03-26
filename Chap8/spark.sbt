@@ -24,6 +24,4 @@ libraryDependencies += "org.apache.spark" %% "spark-streaming" % "1.4.0"
 
 libraryDependencies += "org.apache.spark" %% "spark-hive" % "1.4.0"
 
-libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.1"
-
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.10"
