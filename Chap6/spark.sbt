@@ -60,6 +60,4 @@ libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % "1.
 
 libraryDependencies += "redis.clients" % "jedis" % "2.7.3"
 
-resolvers += "Akka Repository" at "http://repo.akka.io/releases/"
-
 resolvers += "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases/"

@@ -10,7 +10,7 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { mergeStrategy => {
  }
 }}
 
-name := "Chap1"
+name := "Chap2"
 
 version := "1.0"
 

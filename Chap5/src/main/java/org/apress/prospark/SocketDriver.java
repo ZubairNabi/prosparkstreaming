@@ -3,11 +3,10 @@ package org.apress.prospark;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousServerSocketChannel;
-import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -16,22 +15,23 @@ public class SocketDriver extends AbstractDriver {
 
 	private static final Logger LOG = LogManager.getLogger(SocketDriver.class);
 
+	private String hostname;
 	private int port;
 	private SocketStream socketStream;
 
-	public SocketDriver(String path, int port) {
+	public SocketDriver(String path, String hostname, int port) {
 		super(path);
+		this.hostname = hostname;
 		this.port = port;
 	}
 
 	@Override
 	public void init() throws Exception {
-		socketStream = new SocketStream(port);
-		Future<AsynchronousSocketChannel> socketFuture = socketStream.init();
+		socketStream = new SocketStream(hostname, port);
 		LOG.info(String.format("Waiting for client to connect on port %d", port));
-		AsynchronousSocketChannel socket = socketFuture.get();
-		LOG.info(String.format("Client %s connected on port %d", socket.getRemoteAddress(), port));
-		socketStream.kickOff(socket);
+		SocketChannel socketChan = socketStream.init();
+		LOG.info(String.format("Client %s connected on port %d", socketChan.getRemoteAddress(), port));
+		socketStream.kickOff(socketChan);
 		socketStream.start();
 	}
 
@@ -50,29 +50,29 @@ public class SocketDriver extends AbstractDriver {
 
 	static class SocketStream extends Thread {
 
+		private String hostname;
 		private int port;
-		private AsynchronousServerSocketChannel server;
-		private Future<AsynchronousSocketChannel> socketFuture = null;
+		private ServerSocketChannel server;
 		private volatile boolean isDone = false;
-		private AsynchronousSocketChannel socket = null;
+		private SocketChannel socket = null;
 		private long totalBytes;
 		private long totalLines;
 
-		public SocketStream(int port) {
+		public SocketStream(String hostname, int port) {
+			this.hostname = hostname;
 			this.port = port;
 			totalBytes = 0;
 			totalLines = 0;
 		}
 
-		public Future<AsynchronousSocketChannel> init() throws IOException {
-			server = AsynchronousServerSocketChannel.open();
-			server.bind(new InetSocketAddress("localhost", port));
+		public SocketChannel init() throws IOException {
+			server = ServerSocketChannel.open();
+			server.bind(new InetSocketAddress(hostname, port));
 			LOG.info(String.format("Listening on %s", server.getLocalAddress()));
-			socketFuture = server.accept();
-			return socketFuture;
+			return server.accept();
 		}
 
-		public void kickOff(AsynchronousSocketChannel socket) {
+		public void kickOff(SocketChannel socket) {
 			LOG.info("Kicking off data transfer");
 			this.socket = socket;
 		}
@@ -80,18 +80,19 @@ public class SocketDriver extends AbstractDriver {
 		@Override
 		public void run() {
 			try {
-				while (!isDone)
-					;
+				while (!isDone) {
+					Thread.sleep(1000);
+				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOG.error(e);
 			}
 		}
 
 		public void sendMsg(String msg) throws IOException, InterruptedException, ExecutionException {
 			if (socket != null) {
 				ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes(StandardCharsets.UTF_8));
-				Future<Integer> bytesWrittenFuture = socket.write(buffer);
-				totalBytes += bytesWrittenFuture.get();
+				int bytesWritten = socket.write(buffer);
+				totalBytes += bytesWritten;
 			} else {
 				throw new IOException("Client hasn't connected yet!");
 			}
@@ -114,15 +115,16 @@ public class SocketDriver extends AbstractDriver {
 
 	public static void main(String[] args) throws Exception {
 
-		if (args.length != 2) {
-			System.err.println("Usage: SocketDriver <path_to_input_folder> <port>");
+		if (args.length != 3) {
+			System.err.println("Usage: SocketDriver <path_to_input_folder> <hostname> <port>");
 			System.exit(-1);
 		}
 
 		String path = args[0];
-		int port = Integer.parseInt(args[1]);
+		String hostname = args[1];
+		int port = Integer.parseInt(args[2]);
 
-		SocketDriver driver = new SocketDriver(path, port);
+		SocketDriver driver = new SocketDriver(path, hostname, port);
 		try {
 			driver.execute();
 		} finally {

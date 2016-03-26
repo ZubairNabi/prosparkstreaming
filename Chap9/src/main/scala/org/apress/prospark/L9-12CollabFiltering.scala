@@ -30,7 +30,6 @@ object CollabFilteringApp {
         Rating(subject.toInt, activity.toInt, freq.toDouble)
     })
 
-    //TODO: calibrate
     val rank = 10
     val numIterations = 10
     val lambda = 0.01

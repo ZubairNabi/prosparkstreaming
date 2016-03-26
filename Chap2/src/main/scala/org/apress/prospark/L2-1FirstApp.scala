@@ -40,6 +40,4 @@ object TranslateApp {
       .map(tkns => (tkns(0).trim, tkns(1).trim)).toMap
   }
 
-  //val bookPath = "/Users/zubairnabi/Downloads/youtubeChannelVideosFinder/Comments/FhlIHb3SKyw_267.txt" 
-  //http://www.gutenberg.org/cache/epub/1322/pg1322.txt
 }
