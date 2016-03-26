@@ -15,7 +15,7 @@ object VoyagerAppKryo {
   def main(args: Array[String]) {
     if (args.length != 3) {
       System.err.println(
-        "Usage: VoyagerApp <appname> <inputPath> <outputPath>")
+        "Usage: VoyagerAppKryo <appname> <inputPath> <outputPath>")
       System.exit(1)
     }
     val Seq(appName, inputPath, outputPath) = args.toSeq
