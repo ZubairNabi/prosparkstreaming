@@ -26,12 +26,6 @@ libraryDependencies += "org.apache.spark" %% "spark-streaming-mqtt" % "1.4.0"
 
 libraryDependencies += "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.0.1"
 
-libraryDependencies += "org.apache.spark" %% "spark-streaming-flume" % "1.4.0"
-
-libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka" % "1.4.0"
-
-libraryDependencies += "org.apache.spark" %% "spark-streaming-twitter" % "1.4.0"
-
 libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.1"
 
 libraryDependencies += "org.apache.commons" % "commons-pool2" % "2.4.2"
