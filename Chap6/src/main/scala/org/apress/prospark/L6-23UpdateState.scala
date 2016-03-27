@@ -14,18 +14,16 @@ import org.json4s.string2JsonInput
 object StatefulUpdateStateApp {
 
   def main(args: Array[String]) {
-    if (args.length != 3) {
+    if (args.length != 2) {
       System.err.println(
-        "Usage: StatefulUpdateStateApp <master> <appname> <checkpointDir>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: StatefulUpdateStateApp <appname> <checkpointDir>")
       System.exit(1)
     }
 
-    val Seq(master, appName, checkpointDir) = args.toSeq
+    val Seq(appName, checkpointDir) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val batchInterval = 10

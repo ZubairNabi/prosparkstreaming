@@ -21,18 +21,16 @@ import org.json4s.string2JsonInput
 object HBaseSinkApp {
 
   def main(args: Array[String]) {
-    if (args.length != 6) {
+    if (args.length != 5) {
       System.err.println(
-        "Usage: HBaseSinkApp <master> <appname> <hbaseMaster> <tableName> <columnFamilyName> <columnName>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: HBaseSinkApp <appname> <hbaseMaster> <tableName> <columnFamilyName> <columnName>")
       System.exit(1)
     }
 
-    val Seq(master, appName, hbaseMaster, tableName, columnFamilyName, columnName) = args.toSeq
+    val Seq(appName, hbaseMaster, tableName, columnFamilyName, columnName) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val batchInterval = 10

@@ -26,18 +26,16 @@ import java.util.Arrays
 object CassandraSinkApp {
 
   def main(args: Array[String]) {
-    if (args.length != 7) {
+    if (args.length != 6) {
       System.err.println(
-        "Usage: CassandraSinkApp <master> <appname> <cassandraHost> <cassandraPort> <keyspace> <columnFamilyName> <columnName>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: CassandraSinkApp <appname> <cassandraHost> <cassandraPort> <keyspace> <columnFamilyName> <columnName>")
       System.exit(1)
     }
 
-    val Seq(master, appName, cassandraHost, cassandraPort, keyspace, columnFamilyName, columnName) = args.toSeq
+    val Seq(appName, cassandraHost, cassandraPort, keyspace, columnFamilyName, columnName) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val batchInterval = 10

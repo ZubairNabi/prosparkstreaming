@@ -15,18 +15,16 @@ import org.json4s.string2JsonInput
 object StatefulCountersApp {
 
   def main(args: Array[String]) {
-    if (args.length != 2) {
+    if (args.length != 1) {
       System.err.println(
-        "Usage: StatefulCountersApp <master> <appname>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: StatefulCountersApp <appname>")
       System.exit(1)
     }
 
-    val Seq(master, appName) = args.toSeq
+    val Seq(appName) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val batchInterval = 10

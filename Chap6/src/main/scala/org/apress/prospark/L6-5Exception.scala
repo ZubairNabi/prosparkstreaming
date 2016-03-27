@@ -20,18 +20,16 @@ import org.json4s.string2JsonInput
 object MqttSinkAppA {
 
   def main(args: Array[String]) {
-    if (args.length != 4) {
+    if (args.length != 3) {
       System.err.println(
-        "Usage: MqttSinkApp <master> <appname> <outputBrokerUrl> <topic>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: MqttSinkApp <appname> <outputBrokerUrl> <topic>")
       System.exit(1)
     }
 
-    val Seq(master, appName, outputBrokerUrl, topic) = args.toSeq
+    val Seq(appName, outputBrokerUrl, topic) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val batchInterval = 10

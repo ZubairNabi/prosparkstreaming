@@ -19,18 +19,16 @@ import redis.clients.jedis.Jedis
 object StatefulRedisApp {
 
   def main(args: Array[String]) {
-    if (args.length != 4) {
+    if (args.length != 3) {
       System.err.println(
-        "Usage: StatefulRedisApp <master> <appname> <checkpointDir> <hostname>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: StatefulRedisApp <appname> <checkpointDir> <hostname>")
       System.exit(1)
     }
 
-    val Seq(master, appName, checkpointDir, hostname) = args.toSeq
+    val Seq(appName, checkpointDir, hostname) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val batchInterval = 10
