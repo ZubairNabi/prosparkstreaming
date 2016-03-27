@@ -11,17 +11,15 @@ import org.apache.spark.streaming.mqtt.MQTTUtils
 
 object YearlyDistributionApp {
   def main(args: Array[String]) {
-    if (args.length != 5) {
+    if (args.length != 4) {
       System.err.println(
-        "Usage: YearlyDistributionApp <master> <appname> <brokerUrl> <topic> <checkpointDir>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: YearlyDistributionApp <appname> <brokerUrl> <topic> <checkpointDir>")
       System.exit(1)
     }
-    val Seq(master, appName, brokerUrl, topic, checkpointDir) = args.toSeq
+    val Seq(appName, brokerUrl, topic, checkpointDir) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val ssc = new StreamingContext(conf, Seconds(10))

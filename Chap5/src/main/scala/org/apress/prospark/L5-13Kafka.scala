@@ -12,18 +12,16 @@ import org.apache.spark.streaming.kafka.KafkaUtils
 object StationJourneyCountApp {
 
   def main(args: Array[String]) {
-    if (args.length != 8) {
+    if (args.length != 7) {
       System.err.println(
-        "Usage: StationJourneyCountApp <master> <appname> <brokerUrl> <topic> <consumerGroupId> <zkQuorum> <checkpointDir> <outputPath>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: StationJourneyCountApp <appname> <brokerUrl> <topic> <consumerGroupId> <zkQuorum> <checkpointDir> <outputPath>")
       System.exit(1)
     }
 
-    val Seq(master, appName, brokerUrl, topic, consumerGroupId, zkQuorum, checkpointDir, outputPath) = args.toSeq
+    val Seq(appName, brokerUrl, topic, consumerGroupId, zkQuorum, checkpointDir, outputPath) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
     //.set("spark.streaming.receiver.writeAheadLog.enable", "true")
 

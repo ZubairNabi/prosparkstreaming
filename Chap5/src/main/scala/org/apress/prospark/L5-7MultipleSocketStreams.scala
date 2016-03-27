@@ -10,17 +10,15 @@ import java.util.Calendar
 
 object TripByYearMultiApp {
   def main(args: Array[String]) {
-    if (args.length < 5) {
+    if (args.length != 4) {
       System.err.println(
-        "Usage: TripByYearMultiApp <master> <appname> <hostname> <base_port> <num_of_sockets>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: TripByYearMultiApp <appname> <hostname> <base_port> <num_of_sockets>")
       System.exit(1)
     }
-    val Seq(master, appName, hostname, basePort, nSockets) = args.toSeq
+    val Seq(appName, hostname, basePort, nSockets) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val ssc = new StreamingContext(conf, Seconds(10))

@@ -11,17 +11,15 @@ import org.apache.spark.streaming.flume.FlumeUtils
 
 object DailyUserTypeDistributionApp2 {
   def main(args: Array[String]) {
-    if (args.length != 6) {
+    if (args.length != 5) {
       System.err.println(
-        "Usage: DailyUserTypeDistributionApp <master> <appname> <hostname> <port> <checkpointDir> <outputPath>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: DailyUserTypeDistributionApp <appname> <hostname> <port> <checkpointDir> <outputPath>")
       System.exit(1)
     }
-    val Seq(master, appName, hostname, port, checkpointDir, outputPath) = args.toSeq
+    val Seq(appName, hostname, port, checkpointDir, outputPath) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val ssc = new StreamingContext(conf, Seconds(10))

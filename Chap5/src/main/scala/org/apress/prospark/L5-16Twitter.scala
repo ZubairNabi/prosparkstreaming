@@ -14,18 +14,16 @@ import twitter4j.TwitterFactory
 object TwitterApp {
 
   def main(args: Array[String]) {
-    if (args.length != 3) {
+    if (args.length != 2) {
       System.err.println(
-        "Usage: TwitterApp <master> <appname> <outputPath>" +
-          " In local mode, <master> should be 'local[n]' with n > 1")
+        "Usage: TwitterApp <appname> <outputPath>")
       System.exit(1)
     }
 
-    val Seq(master, appName, outputPath) = args.toSeq
+    val Seq(appName, outputPath) = args.toSeq
 
     val conf = new SparkConf()
       .setAppName(appName)
-      .setMaster(master)
       .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
 
     val ssc = new StreamingContext(conf, Seconds(10))
